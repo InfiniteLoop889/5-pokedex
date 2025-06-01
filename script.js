@@ -1,5 +1,5 @@
 async function init() {
-  const BASE_URL = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=8";
+  const BASE_URL = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=16";
   getData(BASE_URL);
 }
 
@@ -31,16 +31,10 @@ async function fetchPokemonDetails(url) {
 }
 
 function displayData(detailedDataArray) {
-  const cardTitleRef = document.querySelectorAll(".card-title");
-  const imgRef = document.querySelectorAll(".pokemon-img");
+  const gripWrapperRef = document.getElementById("grid-wrapper");
 
-  cardTitleRef.forEach((element, index) => {
-    element.innerText = detailedDataArray[index].name;
-  });
-  imgRef.forEach((element, index) => {
-    element.src = detailedDataArray[index].sprites.other["official-artwork"].front_default;
-    // element.src = detailedDataArray[index].sprites.other.home.front_default;
-    element.alt = detailedDataArray[index].name;
+  detailedDataArray.forEach((pokemon) => {
+    gripWrapperRef.innerHTML += createPokemonCard(pokemon);
   });
 }
 
