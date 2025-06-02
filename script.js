@@ -1,5 +1,5 @@
 async function init() {
-  const BASE_URL = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=16";
+  const BASE_URL = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=36";
   getData(BASE_URL);
 }
 
@@ -36,6 +36,10 @@ function displayData(detailedDataArray) {
   detailedDataArray.forEach((pokemon) => {
     gripWrapperRef.innerHTML += createPokemonCard(pokemon);
   });
+}
+
+function capitalizeFirstLetter(val) {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
