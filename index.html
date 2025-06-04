@@ -4,20 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokedex</title>
+    <title>Pokédex</title>
 
     <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./style.css">
     <link rel="icon" type="image/x-icon" href="./img/Poke_Ball.png" />
 </head>
 
-<body class="dark:bg-gray-900">
+<body class="flex flex-col min-h-screen bg-neutral-50 dark:bg-gray-900">
 
-    <nav class="bg-gray-200 border-gray-200 dark:bg-gray-800">
+    <nav class="border-b border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700">
         <div class="max-w-6xl flex flex-wrap items-center justify-between mx-auto p-4">
             <div class="flex items-center space-x-3 rtl:space-x-reverse">
                 <img src="./img/Poke_Ball.png" class="h-12" alt="Pokeball" />
-                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Pokedex</span>
+                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Pokédex</span>
             </div>
             <!-- -------------------------------------- -->
             <div class="flex md:order-2">
@@ -64,11 +64,23 @@
         </div>
     </nav>
 
-    <div class="max-w-5xl mx-auto mt-7">
+    <div class="flex flex-col items-center max-w-5xl mx-auto mt-7 ">
         <div id="grid-wrapper"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4 justify-items-center">
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 m-4 justify-items-center">
         </div>
+        <button type="button" id="button-wrapper"
+            class="max-w-xs text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 my-7 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 cursor-pointer">Load
+            More Pokémon</button>
     </div>
+
+
+
+    <footer class="bg-white shadow-sm mt-auto dark:bg-gray-800">
+        <div class="w-full max-w-screen-xl p-4 md:flex md:justify-center">
+            <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2025 Pokédex</span>
+        </div>
+    </footer>
+
 
     <!-- Own scripts -->
     <script src="./script.js"></script>

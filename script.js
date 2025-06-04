@@ -1,6 +1,10 @@
+let offset = 0;
+let limit = 8;
+
 async function init() {
-  const BASE_URL = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=36";
+  const BASE_URL = `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${limit}`;
   getData(BASE_URL);
+  createLoadMoreButton();
 }
 
 async function getData(url) {
@@ -31,11 +35,27 @@ async function fetchPokemonDetails(url) {
 }
 
 function displayData(detailedDataArray) {
-  const gripWrapperRef = document.getElementById("grid-wrapper");
+  const gridWrapperRef = document.getElementById("grid-wrapper");
+  const fragment = document.createDocumentFragment(); // Fragment erstellen
 
   detailedDataArray.forEach((pokemon) => {
-    gripWrapperRef.innerHTML += createPokemonCard(pokemon);
+    const pokemonCard = document.createElement("div");
+    pokemonCard.innerHTML = createPokemonCard(pokemon);
+    fragment.appendChild(pokemonCard); // Karten zum Fragment hinzufügen
   });
+
+  gridWrapperRef.appendChild(fragment); // Fragment auf einmal anhängen
+}
+
+function createLoadMoreButton() {
+  const buttonWrapper = document.getElementById("button-wrapper");
+  buttonWrapper.addEventListener("click", loadMorePokemon);
+}
+
+async function loadMorePokemon() {
+  offset += limit;
+  const BASE_URL = `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${limit}`;
+  await getData(BASE_URL);
 }
 
 function capitalizeFirstLetter(val) {
