@@ -49,7 +49,7 @@ function createPokemonCard(pokemon) {
   const backgroundColor = colours[primaryType] || "#777";
 
   return `
-    <div class="max-w-xs border border-gray-200 rounded-lg shadow-sm bg-white dark:bg-gray-800 dark:border-gray-700 transition-transform hover:scale-103">
+    <div class="max-w-xs border border-gray-200 rounded-lg shadow-sm bg-white dark:bg-gray-800 dark:border-gray-700 transition-transform hover:scale-103 cursor-pointer">
       <div class="p-4">
         <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${capitalizeFirstLetter(pokemon.name)}</h1>
       </div>
