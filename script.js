@@ -1,5 +1,5 @@
 let offset = 0;
-let limit = 64;
+let limit = 8;
 
 async function init() {
   const BASE_URL = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
@@ -55,7 +55,34 @@ function displayData(detailedDataArray) {
   detailedDataArray.forEach((pokemon) => {
     const pokemonCard = document.createElement("div");
     pokemonCard.innerHTML = createPokemonCard(pokemon);
+
+    // Add click event listener to open overlay
+    pokemonCard.addEventListener("click", () => {
+      openOverlay(pokemon);
+    });
+
     gridWrapperRef.appendChild(pokemonCard);
+  });
+}
+
+function openOverlay(pokemon) {
+  const overlay = document.createElement("div");
+  overlay.classList.add("fixed", "top-0", "left-0", "w-full", "h-full", "bg-current/50", "flex", "justify-center", "items-center", "z-50");
+
+  overlay.innerHTML = createOverlayTemplate(pokemon);
+
+  document.body.appendChild(overlay);
+
+  // Add event listener to close the overlay when clicking outside the content
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      document.body.removeChild(overlay);
+    }
+  });
+
+  // Add event listener to close the overlay via the close button
+  document.getElementById("close-overlay").addEventListener("click", () => {
+    document.body.removeChild(overlay);
   });
 }
 
@@ -89,8 +116,6 @@ async function loadMorePokemon() {
 function capitalizeFirstLetter(val) {
   return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
-
-document.getElementById("");
 
 document.addEventListener("DOMContentLoaded", () => {
   init();

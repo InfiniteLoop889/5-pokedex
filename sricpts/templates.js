@@ -19,6 +19,12 @@ const colours = {
   fairy: "#D685AD",
 };
 
+function getBackgroundColor(pokemon) {
+  const primaryType = pokemon.types[0].type.name;
+  const backgroundColor = colours[primaryType] || "#777";
+  return backgroundColor;
+}
+
 function getTextColor(backgroundColor) {
   // Extracting RGB-Values
   const r = parseInt(backgroundColor.slice(1, 3), 16);
@@ -45,21 +51,31 @@ function createTypeElements(types) {
 
 function createPokemonCard(pokemon) {
   const types = pokemon.types.map((typeObj) => typeObj.type.name);
-  const primaryType = pokemon.types[0].type.name;
-  const backgroundColor = colours[primaryType] || "#777";
 
   return `
-    <div class="max-w-xs border border-gray-200 rounded-lg shadow-sm bg-white dark:bg-gray-800 dark:border-gray-700 transition-transform hover:scale-103 cursor-pointer">
+    <div class="max-w-xs border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-800 transition-transform hover:scale-103 cursor-pointer">
       <div class="p-4">
         <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-100">${capitalizeFirstLetter(pokemon.name)}</h1>
       </div>
-      <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}" class="w-full h-auto object-contain p-4" style="background-color: ${backgroundColor};"/>
+      <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}" class="w-full h-auto object-contain p-4" style="background-color: ${getBackgroundColor(pokemon)};"/>
       <div class="pt-1 px-4 pb-4 space-y-2">
         <h3 class="mb-3 text-sm text-gray-800 dark:text-gray-100">#${String(pokemon.id).padStart(3, "0")}</h3>
         <div class="flex gap-2">
           ${createTypeElements(types)}
         </div>
       </div>
+    </div>
+  `;
+}
+
+function createOverlayTemplate(pokemon) {
+  return `
+    <div class="max-w-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center">
+      <h2 class="p-4">${capitalizeFirstLetter(pokemon.name)}</h2>
+      <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}" style="background-color: ${getBackgroundColor(pokemon)};">
+      <p>Height: ${pokemon.height}</p>
+      <p>Weight: ${pokemon.weight}</p>
+      <button id="close-overlay">Close</button>
     </div>
   `;
 }
