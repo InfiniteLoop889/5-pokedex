@@ -19,6 +19,9 @@ async function getData(url) {
       detailedDataArray.push(detailedData);
     }
 
+    // console.log(dataArray);
+    // console.log(detailedDataArray);
+
     displayData(detailedDataArray);
   } catch (error) {
     console.error(error);
@@ -54,35 +57,54 @@ function displayData(detailedDataArray) {
 
   detailedDataArray.forEach((pokemon) => {
     const pokemonCard = document.createElement("div");
-    pokemonCard.innerHTML = createPokemonCard(pokemon);
 
+    pokemonCard.innerHTML = createPokemonCard(pokemon);
     // Add click event listener to open overlay
     pokemonCard.addEventListener("click", () => {
-      openOverlay(pokemon);
+      openOverlay(pokemon, detailedDataArray);
     });
 
     gridWrapperRef.appendChild(pokemonCard);
   });
 }
 
-function openOverlay(pokemon) {
+function openOverlay(pokemon, detailedDataArray) {
   const overlay = document.createElement("div");
+
   overlay.classList.add("fixed", "top-0", "left-0", "w-full", "h-full", "bg-current/50", "flex", "justify-center", "items-center", "z-50");
-
   overlay.innerHTML = createOverlayTemplate(pokemon);
-
   document.body.appendChild(overlay);
 
-  // Add event listener to close the overlay when clicking outside the content
+  addOverlayEventListeners(overlay, pokemon, detailedDataArray);
+}
+
+function addOverlayEventListeners(overlay, pokemon, detailedDataArray) {
+  const currentIndex = pokemon.id - 1;
+
+  // Close the overlay with the close button
+  document.getElementById("close-overlay").addEventListener("click", () => {
+    document.body.removeChild(overlay);
+  });
+
+  // Close the overlay when clicking outside the card
   overlay.addEventListener("click", (event) => {
     if (event.target === overlay) {
       document.body.removeChild(overlay);
     }
   });
 
-  // Add event listener to close the overlay via the close button
-  document.getElementById("close-overlay").addEventListener("click", () => {
+  // Navigate to the previous Pokémon
+  document.getElementById("prev-button").addEventListener("click", () => {
+    const prevIndex = (currentIndex - 1 + detailedDataArray.length) % detailedDataArray.length;
     document.body.removeChild(overlay);
+    openOverlay(detailedDataArray[prevIndex], detailedDataArray);
+  });
+
+  // Navigate to the next Pokémon
+  document.getElementById("next-button").addEventListener("click", () => {
+    const nextIndex = (currentIndex + 1) % detailedDataArray.length;
+    document.body.removeChild(overlay);
+    openOverlay(detailedDataArray[nextIndex], detailedDataArray);
   });
 }
 

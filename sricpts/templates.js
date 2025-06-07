@@ -70,11 +70,13 @@ function createPokemonCard(pokemon) {
 
 function createOverlayTemplate(pokemon) {
   return `
-    <div class="max-w-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center">
+    <div class="relative max-w-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center">
       <h2 class="p-4">${capitalizeFirstLetter(pokemon.name)}</h2>
       <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}" style="background-color: ${getBackgroundColor(pokemon)};">
       <p>Height: ${pokemon.height}</p>
       <p>Weight: ${pokemon.weight}</p>
+      <button id="prev-button" class="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full cursor-pointer">←</button>
+      <button id="next-button" class="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full cursor-pointer">→</button>
       <button id="close-overlay">Close</button>
     </div>
   `;
