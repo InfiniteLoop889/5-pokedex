@@ -70,11 +70,33 @@ function createPokemonCard(pokemon) {
 
 function createOverlayTemplate(pokemon) {
   return `
-    <div class="relative max-w-xs border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center">
+    <div class="relative max-w-md border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-center">
       <h2 class="p-4">${capitalizeFirstLetter(pokemon.name)}</h2>
       <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}" style="background-color: ${getBackgroundColor(pokemon)};">
-      <p>Height: ${pokemon.height}</p>
-      <p>Weight: ${pokemon.weight}</p>
+      
+      <div class="flex justify-around bg-neutral-50 dark:bg-gray-900">
+        <button class="tab-button flex-grow py-2 border-b-2 border-transparent border-gray-400 hover:border-gray-400 cursor-pointer text-center" data-tab="stats">Stats</button>
+        <button class="tab-button flex-grow py-2 border-b-2 border-transparent border-gray-400 hover:border-gray-400 cursor-pointer text-center" data-tab="abilities">Abilities</button>
+        <button class="tab-button flex-grow py-2 border-b-2 border-transparent border-gray-400 hover:border-gray-400 cursor-pointer text-center" data-tab="moves">Moves</button>
+      </div>
+
+      <div class="tab-content mt-4">
+        <div class="tab-panel" id="stats">
+          <p>Height: ${pokemon.height}</p>
+          <p>Weight: ${pokemon.weight}</p>
+          <p>Base Experience: ${pokemon.base_experience}</p>
+        </div>
+        <div class="tab-panel hidden" id="abilities">
+          <p>${pokemon.abilities.map((ability) => capitalizeFirstLetter(ability.ability.name)).join(", ")}</p>
+        </div>
+        <div class="tab-panel hidden" id="moves">
+          <p>${pokemon.moves
+            .slice(0, 5)
+            .map((move) => capitalizeFirstLetter(move.move.name))
+            .join(", ")}</p>
+        </div>
+      </div>
+
       <button id="prev-button" class="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full cursor-pointer">←</button>
       <button id="next-button" class="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded-full cursor-pointer">→</button>
       <button id="close-overlay">Close</button>

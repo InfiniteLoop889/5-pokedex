@@ -106,6 +106,24 @@ function addOverlayEventListeners(overlay, pokemon, detailedDataArray) {
     document.body.removeChild(overlay);
     openOverlay(detailedDataArray[nextIndex], detailedDataArray);
   });
+
+  document.addEventListener("click", (event) => {
+    if (event.target.classList.contains("tab-button")) {
+      const tab = event.target.dataset.tab;
+
+      // Alle Tabs und Inhalte zurücksetzen
+      document.querySelectorAll(".tab-button").forEach((button) => {
+        button.classList.add("border-transparent");
+      });
+      document.querySelectorAll(".tab-panel").forEach((panel) => {
+        panel.classList.add("hidden");
+      });
+
+      // Aktiven Tab und Inhalt anzeigen
+      event.target.classList.remove("border-transparent");
+      document.getElementById(tab).classList.remove("hidden");
+    }
+  });
 }
 
 function createLoadMoreButton() {
