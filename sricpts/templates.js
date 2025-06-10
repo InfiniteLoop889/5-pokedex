@@ -1,42 +1,3 @@
-const colours = {
-  normal: "#A8A77A",
-  fire: "#EE8130",
-  water: "#6390F0",
-  electric: "#F7D02C",
-  grass: "#7AC74C",
-  ice: "#96D9D6",
-  fighting: "#C22E28",
-  poison: "#A33EA1",
-  ground: "#E2BF65",
-  flying: "#A98FF3",
-  psychic: "#F95587",
-  bug: "#A6B91A",
-  rock: "#B6A136",
-  ghost: "#735797",
-  dragon: "#6F35FC",
-  dark: "#705746",
-  steel: "#B7B7CE",
-  fairy: "#D685AD",
-};
-
-function getBackgroundColor(pokemon) {
-  const primaryType = pokemon.types[0].type.name;
-  const backgroundColor = colours[primaryType] || "#777";
-  return backgroundColor;
-}
-
-function getTextColor(backgroundColor) {
-  // Extracting RGB-Values
-  const r = parseInt(backgroundColor.slice(1, 3), 16);
-  const g = parseInt(backgroundColor.slice(3, 5), 16);
-  const b = parseInt(backgroundColor.slice(5, 7), 16);
-
-  // Calculate relative brightness (Luminance)
-  const brightness = r * 0.299 + g * 0.587 + b * 0.114;
-
-  return brightness > 163 ? "dark:text-gray-800" : "text-white";
-}
-
 function createTypeElements(types) {
   let typeHtml = "";
 
@@ -75,7 +36,7 @@ function createOverlayTemplate(pokemon) {
       <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}" style="background-color: ${getBackgroundColor(pokemon)};">
       
       <div class="flex justify-around bg-neutral-50 dark:bg-gray-900">
-        <button class="tab-button flex-grow py-2 border-b-2 border-transparent border-gray-400 hover:border-gray-400 cursor-pointer text-center" data-tab="stats">Stats</button>
+        <button class="tab-button flex-grow py-2 border-b-2 border-gray-400 hover:border-gray-400 cursor-pointer text-center" data-tab="stats">Stats</button>
         <button class="tab-button flex-grow py-2 border-b-2 border-transparent border-gray-400 hover:border-gray-400 cursor-pointer text-center" data-tab="abilities">Abilities</button>
         <button class="tab-button flex-grow py-2 border-b-2 border-transparent border-gray-400 hover:border-gray-400 cursor-pointer text-center" data-tab="moves">Moves</button>
       </div>
