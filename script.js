@@ -1,7 +1,7 @@
 // ------------------------------- Global variables -------------------------------
 
 let offset = 0;
-let limit = 32;
+let limit = 8;
 
 const colours = {
   normal: "#A8A77A",
@@ -106,11 +106,11 @@ async function loadMorePokemon() {
 
 // ------------------------------- Overlay functions -------------------------------
 
-function openOverlay(pokemon, detailedDataArray) {
+async function openOverlay(pokemon, detailedDataArray) {
   const overlay = document.createElement("div");
 
   overlay.classList.add("fixed", "top-0", "left-0", "w-full", "h-full", "bg-current/50", "flex", "justify-center", "items-center", "z-50");
-  overlay.innerHTML = createOverlayTemplate(pokemon);
+  overlay.innerHTML = await createOverlayTemplate(pokemon); // await hinzufügen
   document.body.appendChild(overlay);
 
   addOverlayEventListeners(overlay, pokemon, detailedDataArray);

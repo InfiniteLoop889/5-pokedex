@@ -1,7 +1,7 @@
 async function getAllPokemon() {
   try {
-    // let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0");
-    let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100&offset=0");
+    let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0");
+    // let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10&offset=0");
     let data = await response.json();
     return data.results;
   } catch (error) {
@@ -10,36 +10,42 @@ async function getAllPokemon() {
 }
 
 function addSearchBarListener(searchInput, pokemonList) {
+  const buttonWrapper = document.getElementById("button-wrapper");
+  const gridWrapper = document.getElementById("grid-wrapper");
+
   searchInput.addEventListener("input", async function (event) {
     const searchString = event.target.value;
 
     if (searchString.length >= 3) {
-      const filteredPokemonArray = pokemonList.filter((pokemon) => pokemon.name.includes(searchString.toLowerCase()));
-      const buttonWrapper = document.getElementById("button-wrapper");
-      buttonWrapper.classList.add("hidden");
-
-      const gridWrapper = document.getElementById("grid-wrapper");
-      gridWrapper.innerHTML = "";
-
-      const pokemonData = await createPokemonArray(filteredPokemonArray);
-      displayData(pokemonData);
+      await handleSearch(gridWrapper, buttonWrapper, pokemonList, searchString);
     } else if (searchString.length === 0) {
-      // Reset offset and limit to their original values
-      offset = 0;
-      limit = 32;
-
-      const BASE_URL = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
-      const gridWrapper = document.getElementById("grid-wrapper");
-      gridWrapper.innerHTML = "";
-
-      const originalPokemonList = await fetchData(BASE_URL);
-      const pokemonData = await createPokemonArray(originalPokemonList);
-      displayData(pokemonData);
-
-      const buttonWrapper = document.getElementById("button-wrapper");
-      buttonWrapper.classList.remove("hidden");
+      await resetToOriginalList(gridWrapper, buttonWrapper);
     }
   });
+}
+
+async function handleSearch(gridWrapper, buttonWrapper, pokemonList, searchString) {
+  const filteredPokemonArray = pokemonList.filter((pokemon) => pokemon.name.includes(searchString.toLowerCase()));
+  buttonWrapper.classList.add("hidden");
+  gridWrapper.innerHTML = "";
+
+  const pokemonData = await createPokemonArray(filteredPokemonArray);
+  displayData(pokemonData);
+}
+
+// reset offset and limit to display initial content after deleting the search bar input
+async function resetToOriginalList(gridWrapper, buttonWrapper) {
+  offset = 0;
+  limit = 32;
+
+  const BASE_URL = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
+  gridWrapper.innerHTML = "";
+
+  const originalPokemonList = await fetchData(BASE_URL);
+  const pokemonData = await createPokemonArray(originalPokemonList);
+  displayData(pokemonData);
+
+  buttonWrapper.classList.remove("hidden");
 }
 
 async function initSearch() {
