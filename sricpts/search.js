@@ -1,7 +1,6 @@
 async function getAllPokemon() {
   try {
     let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0");
-    // let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10&offset=0");
     let data = await response.json();
     return data.results;
   } catch (error) {
@@ -9,7 +8,7 @@ async function getAllPokemon() {
   }
 }
 
-function addSearchBarListener(searchInput, pokemonList) {
+function addSearchBarListener(pokemonList, searchInput) {
   const buttonWrapper = document.getElementById("button-wrapper");
   const gridWrapper = document.getElementById("grid-wrapper");
 
@@ -41,7 +40,7 @@ async function resetToOriginalList(gridWrapper, buttonWrapper) {
   const BASE_URL = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
   gridWrapper.innerHTML = "";
 
-  const originalPokemonList = await fetchData(BASE_URL);
+  const originalPokemonList = await fetchPokemonData(BASE_URL);
   const pokemonData = await createPokemonArray(originalPokemonList);
   displayData(pokemonData);
 
@@ -50,9 +49,12 @@ async function resetToOriginalList(gridWrapper, buttonWrapper) {
 
 async function initSearch() {
   const pokemonList = await getAllPokemon();
-  const searchInput = document.getElementById("search-navbar");
+  const searchInputDesktop = document.getElementById("search-navbar-desktop");
+  const searchInputMobile = document.getElementById("search-navbar-mobile");
 
-  searchInput.value = "";
+  searchInputDesktop.value = "";
+  searchInputMobile.value = "";
 
-  addSearchBarListener(searchInput, pokemonList);
+  addSearchBarListener(pokemonList, searchInputDesktop);
+  addSearchBarListener(pokemonList, searchInputMobile);
 }

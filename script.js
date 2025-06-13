@@ -1,36 +1,16 @@
 // ------------------------------- Global variables -------------------------------
 
 let offset = 0;
-let limit = 8;
-
-const colours = {
-  normal: "#A8A77A",
-  fire: "#EE8130",
-  water: "#6390F0",
-  electric: "#F7D02C",
-  grass: "#7AC74C",
-  ice: "#96D9D6",
-  fighting: "#C22E28",
-  poison: "#A33EA1",
-  ground: "#E2BF65",
-  flying: "#A98FF3",
-  psychic: "#F95587",
-  bug: "#A6B91A",
-  rock: "#B6A136",
-  ghost: "#735797",
-  dragon: "#6F35FC",
-  dark: "#705746",
-  steel: "#B7B7CE",
-  fairy: "#D685AD",
-};
+let limit = 32;
+const allRenderedPokemonArr = [];
 
 // ------------------------------- Fetch and display functions -------------------------------
 
-async function fetchData(url) {
+async function fetchPokemonData(url) {
   try {
     let response = await fetch(url);
     const responseToJson = await response.json();
-    return responseToJson.results; // Rückgabe der Rohdaten
+    return responseToJson.results;
   } catch (error) {
     console.error(error);
   }
@@ -42,6 +22,7 @@ async function createPokemonArray(dataArray) {
   for (const pokemon of dataArray) {
     const detailedData = await fetchPokemonDetails(pokemon.url);
     detailedDataArray.push(detailedData);
+    allRenderedPokemonArr.push(detailedData);
   }
 
   return detailedDataArray;
@@ -65,7 +46,7 @@ function displayData(detailedDataArray) {
     pokemonCard.innerHTML = createPokemonCard(pokemon);
 
     pokemonCard.addEventListener("click", () => {
-      openOverlay(pokemon, detailedDataArray);
+      openOverlay(pokemon, allRenderedPokemonArr);
     });
 
     gridWrapperRef.appendChild(pokemonCard);
@@ -90,7 +71,7 @@ async function loadMorePokemon() {
   try {
     offset += limit;
     const BASE_URL = `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${limit}`;
-    const rawPokemonData = await fetchData(BASE_URL);
+    const rawPokemonData = await fetchPokemonData(BASE_URL);
     const detailedPokemonData = await createPokemonArray(rawPokemonData);
     displayData(detailedPokemonData);
 
@@ -98,31 +79,29 @@ async function loadMorePokemon() {
     loadingButton.classList.add("hidden");
   } catch (error) {
     console.error("Fehler beim Laden der Pokémon:", error);
-
-    buttonWrapper.classList.remove("hidden");
-    loadingButton.classList.add("hidden");
   }
 }
 
 // ------------------------------- Overlay functions -------------------------------
 
-async function openOverlay(pokemon, detailedDataArray) {
+async function openOverlay(pokemon, allRenderedPokemonArr) {
   const overlay = document.createElement("div");
 
   overlay.classList.add("fixed", "top-0", "left-0", "w-full", "h-full", "bg-current/50", "flex", "justify-center", "items-center", "z-50");
-  overlay.innerHTML = await createOverlayTemplate(pokemon); // await hinzufügen
+  overlay.innerHTML = await createOverlayTemplate(pokemon, allRenderedPokemonArr);
   document.body.appendChild(overlay);
+  document.body.classList.add("overflow-hidden");
 
-  addOverlayEventListeners(overlay, pokemon, detailedDataArray);
+  addOverlayEventListeners(overlay, pokemon, allRenderedPokemonArr);
 }
 
-function addOverlayEventListeners(overlay, pokemon, detailedDataArray) {
+function addOverlayEventListeners(overlay, pokemon, allRenderedPokemonArr) {
   const currentIndex = pokemon.id - 1;
 
   addCloseButtonOverlayListener(overlay);
   addCloseOverlayListener(overlay);
-  addPrevButtonListener(overlay, currentIndex, detailedDataArray);
-  addNextButtonListener(overlay, currentIndex, detailedDataArray);
+  addPrevButtonListener(overlay, currentIndex, allRenderedPokemonArr);
+  addNextButtonListener(overlay, currentIndex, allRenderedPokemonArr);
   addTabButtonListener();
 }
 
@@ -130,6 +109,7 @@ function addCloseButtonOverlayListener(overlay) {
   // Close the overlay with the close button
   document.getElementById("close-overlay").addEventListener("click", () => {
     document.body.removeChild(overlay);
+    document.body.classList.remove("overflow-hidden");
   });
 }
 
@@ -138,23 +118,24 @@ function addCloseOverlayListener(overlay) {
   overlay.addEventListener("click", (event) => {
     if (event.target === overlay) {
       document.body.removeChild(overlay);
+      document.body.classList.remove("overflow-hidden");
     }
   });
 }
 
-function addPrevButtonListener(overlay, currentIndex, detailedDataArray) {
+function addPrevButtonListener(overlay, currentIndex, allRenderedPokemonArr) {
   document.getElementById("prev-button").addEventListener("click", () => {
-    const prevIndex = (currentIndex - 1 + detailedDataArray.length) % detailedDataArray.length;
+    const prevIndex = (currentIndex - 1 + allRenderedPokemonArr.length) % allRenderedPokemonArr.length;
     document.body.removeChild(overlay);
-    openOverlay(detailedDataArray[prevIndex], detailedDataArray);
+    openOverlay(allRenderedPokemonArr[prevIndex], allRenderedPokemonArr);
   });
 }
 
-function addNextButtonListener(overlay, currentIndex, detailedDataArray) {
+function addNextButtonListener(overlay, currentIndex, allRenderedPokemonArr) {
   document.getElementById("next-button").addEventListener("click", () => {
-    const nextIndex = (currentIndex + 1) % detailedDataArray.length;
+    const nextIndex = (currentIndex + 1) % allRenderedPokemonArr.length;
     document.body.removeChild(overlay);
-    openOverlay(detailedDataArray[nextIndex], detailedDataArray);
+    openOverlay(allRenderedPokemonArr[nextIndex], allRenderedPokemonArr);
   });
 }
 
@@ -202,12 +183,16 @@ function getTextColor(backgroundColor) {
   return brightness > 163 ? "dark:text-gray-800" : "text-white";
 }
 
+function findPokemonByName(name, allRenderedPokemonArr) {
+  return allRenderedPokemonArr.find((p) => p.name.toLowerCase() === name.toLowerCase());
+}
+
 // ------------------------------- init() function -------------------------------
 
 async function init() {
   const BASE_URL = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
-  const dataArray = await fetchData(BASE_URL);
-  const pokemonData = await createPokemonArray(dataArray); // Verarbeitung der Daten
+  const dataArray = await fetchPokemonData(BASE_URL);
+  const pokemonData = await createPokemonArray(dataArray);
   displayData(pokemonData);
   addEventToLoadMoreButton();
 }
