@@ -1,7 +1,7 @@
 // ------------------------------- Global variables -------------------------------
 
 let offset = 0;
-let limit = 32;
+let limit = 24;
 const allRenderedPokemonArr = [];
 
 // ------------------------------- Fetch and display functions -------------------------------
@@ -9,20 +9,22 @@ const allRenderedPokemonArr = [];
 async function fetchPokemonData(url) {
   try {
     let response = await fetch(url);
-    const responseToJson = await response.json();
-    return responseToJson.results;
+    let data = await response.json();
+    return data.results;
   } catch (error) {
     console.error(error);
   }
 }
 
-async function createPokemonArray(dataArray) {
+async function createPokemonArray(dataArray, skipHandleSearch = true) {
   const detailedDataArray = [];
 
   for (const pokemon of dataArray) {
     const detailedData = await fetchPokemonDetails(pokemon.url);
     detailedDataArray.push(detailedData);
-    allRenderedPokemonArr.push(detailedData);
+    if (skipHandleSearch) {
+      allRenderedPokemonArr.push(detailedData);
+    }
   }
 
   return detailedDataArray;
@@ -37,8 +39,12 @@ async function fetchPokemonDetails(url) {
   }
 }
 
-function displayData(detailedDataArray) {
+function displayData(detailedDataArray, clearWrapper = false) {
   const gridWrapperRef = document.getElementById("grid-wrapper");
+
+  if (clearWrapper) {
+    gridWrapperRef.innerHTML = "";
+  }
 
   detailedDataArray.forEach((pokemon) => {
     const pokemonCard = document.createElement("div");
@@ -70,10 +76,10 @@ async function loadMorePokemon() {
 
   try {
     offset += limit;
-    const BASE_URL = `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${limit}`;
-    const rawPokemonData = await fetchPokemonData(BASE_URL);
-    const detailedPokemonData = await createPokemonArray(rawPokemonData);
-    displayData(detailedPokemonData);
+    const baseUrl = `https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${limit}`;
+    const rawPokemonData = await fetchPokemonData(baseUrl);
+    const detailedPokemonData = await createPokemonArray(rawPokemonData, true);
+    displayData(detailedPokemonData, false);
 
     buttonWrapper.classList.remove("hidden");
     loadingButton.classList.add("hidden");
@@ -106,7 +112,6 @@ function addOverlayEventListeners(overlay, pokemon, allRenderedPokemonArr) {
 }
 
 function addCloseButtonOverlayListener(overlay) {
-  // Close the overlay with the close button
   document.getElementById("close-overlay").addEventListener("click", () => {
     document.body.removeChild(overlay);
     document.body.classList.remove("overflow-hidden");
@@ -114,7 +119,6 @@ function addCloseButtonOverlayListener(overlay) {
 }
 
 function addCloseOverlayListener(overlay) {
-  // Close the overlay when clicking outside the pokemon card
   overlay.addEventListener("click", (event) => {
     if (event.target === overlay) {
       document.body.removeChild(overlay);
@@ -143,23 +147,29 @@ function addTabButtonListener() {
   document.addEventListener("click", (event) => {
     if (event.target.classList.contains("tab-button")) {
       const tab = event.target.dataset.tab;
-
-      // Alle Tabs und Inhalte zurücksetzen
       document.querySelectorAll(".tab-button").forEach((button) => {
         button.classList.add("border-transparent");
       });
       document.querySelectorAll(".tab-panel").forEach((panel) => {
         panel.classList.add("hidden");
       });
-
-      // Aktiven Tab und Inhalt anzeigen
       event.target.classList.remove("border-transparent");
       document.getElementById(tab).classList.remove("hidden");
     }
   });
 }
 
-// ------------------------------- Helper functions -------------------------------
+function getTypeElements(types) {
+  let typeHtml = "";
+
+  for (let type of types) {
+    const backgroundColor = colours[type];
+    const textColor = getTextColor(backgroundColor);
+    typeHtml += createTypeElements(type, backgroundColor, textColor);
+  }
+
+  return typeHtml;
+}
 
 function capitalizeFirstLetter(val) {
   return String(val).charAt(0).toUpperCase() + String(val).slice(1);
@@ -172,12 +182,9 @@ function getBackgroundColor(pokemon) {
 }
 
 function getTextColor(backgroundColor) {
-  // Extracting RGB-Values
   const r = parseInt(backgroundColor.slice(1, 3), 16);
   const g = parseInt(backgroundColor.slice(3, 5), 16);
   const b = parseInt(backgroundColor.slice(5, 7), 16);
-
-  // Calculate relative brightness (Luminance)
   const brightness = r * 0.299 + g * 0.587 + b * 0.114;
 
   return brightness > 163 ? "dark:text-gray-800" : "text-white";
@@ -190,10 +197,10 @@ function findPokemonByName(name, allRenderedPokemonArr) {
 // ------------------------------- init() function -------------------------------
 
 async function init() {
-  const BASE_URL = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
-  const dataArray = await fetchPokemonData(BASE_URL);
-  const pokemonData = await createPokemonArray(dataArray);
-  displayData(pokemonData);
+  const baseUrl = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
+  const dataArray = await fetchPokemonData(baseUrl);
+  const pokemonData = await createPokemonArray(dataArray, true);
+  displayData(pokemonData, true);
   addEventToLoadMoreButton();
 }
 

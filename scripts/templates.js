@@ -1,22 +1,12 @@
-// ------------------------------------------------------------------------------------
 // ------------------------------- Create Type Elements -------------------------------
-// ------------------------------------------------------------------------------------
 
-function createTypeElements(types) {
-  let typeHtml = "";
-
-  for (let type of types) {
-    const backgroundColor = colours[type];
-    const textColor = getTextColor(backgroundColor);
-    typeHtml += `<span class="min-w-[56px] px-2 py-1 rounded text-xs ${textColor} text-center" style="background-color: ${backgroundColor};">${capitalizeFirstLetter(type)}</span>`;
-  }
-
-  return typeHtml;
+function createTypeElements(type, backgroundColor, textColor) {
+  return `
+    <span class="min-w-[56px] px-2 py-1 rounded text-xs ${textColor} text-center" style="background-color: ${backgroundColor};">${capitalizeFirstLetter(type)}</span>
+  `;
 }
 
-// -----------------------------------------------------------------------------------
 // ------------------------------- Create Pokemon card -------------------------------
-// -----------------------------------------------------------------------------------
 
 function createPokemonCard(pokemon) {
   const types = pokemon.types.map((typeObj) => typeObj.type.name);
@@ -30,32 +20,40 @@ function createPokemonCard(pokemon) {
       <div class="pt-1 px-4 pb-4 space-y-2">
         <h3 class="mb-3 text-sm text-gray-800 dark:text-gray-100">#${String(pokemon.id).padStart(3, "0")}</h3>
         <div class="flex gap-2">
-          ${createTypeElements(types)}
+          ${getTypeElements(types)}
         </div>
       </div>
     </div>
   `;
 }
 
-// ---------------------------------------------------------------------------------------------
 // ------------------------------- Create overlay tab components -------------------------------
-// ---------------------------------------------------------------------------------------------
 
 // --------    Create stats tab    --------
 
+function processStats(stats) {
+  return stats.map((stat) => ({
+    name: capitalizeFirstLetter(stat.stat.name),
+    value: stat.base_stat,
+    width: Math.min(stat.base_stat, 150) / 1.5,
+  }));
+}
+
 function createStatsTab(stats) {
+  const processedStats = processStats(stats);
+
   return `
     <div class="space-y-2 px-4">
-      ${stats
+      ${processedStats
         .map(
           (stat) => `
         <div>
           <div class="flex justify-between text-xs mb-1">
-            <span>${capitalizeFirstLetter(stat.stat.name)}</span>
-            <span>${stat.base_stat}</span>
+            <span>${stat.name}</span>
+            <span>${stat.value}</span>
           </div>
           <div class="w-full bg-gray-200 rounded h-3 dark:bg-gray-700">
-            <div class="h-3 rounded bg-blue-500" style="width: ${Math.min(stat.base_stat, 150) / 1.5}%;"></div>
+            <div class="h-3 rounded bg-blue-500" style="width: ${stat.width}%;"></div>
           </div>
         </div>
         `
@@ -83,11 +81,11 @@ function createTypesTab(types) {
     <div class="space-y-4 px-4">
       <div>
         <h3 class="text-sm font-semibold">Types:</h3>
-        <p>${types.map((type) => capitalizeFirstLetter(type)).join(", ")}</p>
+        <p class="text-sm">${types.map((type) => capitalizeFirstLetter(type)).join(", ")}</p>
       </div>
       <div>
         <h3 class="text-sm font-semibold">Strengths:</h3>
-        <p>${
+        <p class="text-sm">${
           Array.from(strengths)
             .map((type) => capitalizeFirstLetter(type))
             .join(", ") || "None"
@@ -95,7 +93,7 @@ function createTypesTab(types) {
       </div>
       <div>
         <h3 class="text-sm font-semibold">Weaknesses:</h3>
-        <p>${
+        <p class="text-sm">${
           Array.from(weaknesses)
             .map((type) => capitalizeFirstLetter(type))
             .join(", ") || "None"
@@ -108,11 +106,9 @@ function createTypesTab(types) {
 // --------    Create evolutions tab    --------
 
 async function loadEvolutions(pokemon) {
-  // 1. get species link
   const speciesResponse = await fetch(pokemon.species.url);
   const speciesToJson = await speciesResponse.json();
 
-  // 2. get evolution chain link
   const evoResponse = await fetch(speciesToJson.evolution_chain.url);
   const evoToJson = await evoResponse.json();
 
@@ -127,7 +123,9 @@ function createEvolutionsTab(evolutionChain, allRenderedPokemonArr) {
   const basePokemon = findPokemonByName(base, allRenderedPokemonArr);
   if (basePokemon) {
     html += `<div class="flex flex-col items-center">
-               <img src="${basePokemon.sprites.other["official-artwork"].front_default}" alt="${basePokemon.name}" class="h-full object-contain">
+               <img src="${basePokemon.sprites.other["official-artwork"].front_default}" 
+                    alt="${basePokemon.name}" 
+                    class="w-24 h-24 object-contain">
                <span class="text-sm font-medium">${capitalizeFirstLetter(basePokemon.name)}</span>
              </div>`;
   }
@@ -142,7 +140,9 @@ function createEvolutionsTab(evolutionChain, allRenderedPokemonArr) {
       }
 
       html += `<div class="flex flex-col items-center">
-                 <img src="${stage1Pokemon.sprites.other["official-artwork"].front_default}" alt="${stage1Pokemon.name}" class="h-full object-contain">
+                 <img src="${stage1Pokemon.sprites.other["official-artwork"].front_default}" 
+                      alt="${stage1Pokemon.name}" 
+                      class="w-24 h-24 object-contain">
                  <span class="text-sm font-medium">${capitalizeFirstLetter(stage1Pokemon.name)}</span>
                </div>`;
     }
@@ -151,20 +151,20 @@ function createEvolutionsTab(evolutionChain, allRenderedPokemonArr) {
     stage1.evolves_to.forEach((stage2, index2) => {
       const stage2Pokemon = findPokemonByName(stage2.species.name, allRenderedPokemonArr);
       if (stage2Pokemon) {
-        // Add arrow between stages
         if (index2 > 0 || stage1Pokemon) {
           html += `<span class="flex items-center justify-center text-gray-500">→</span>`;
         }
 
         html += `<div class="flex flex-col items-center">
-                   <img src="${stage2Pokemon.sprites.other["official-artwork"].front_default}" alt="${stage2Pokemon.name}" class="h-full object-contain">
+                   <img src="${stage2Pokemon.sprites.other["official-artwork"].front_default}" 
+                        alt="${stage2Pokemon.name}" 
+                        class="w-24 h-24 object-contain">
                    <span class="text-sm font-medium">${capitalizeFirstLetter(stage2Pokemon.name)}</span>
                  </div>`;
       }
     });
   });
 
-  // Wrap all stages in a flex container
   return `<div class="flex gap-x-4 justify-center items-center px-4">
             ${html}
           </div>`;
@@ -177,9 +177,7 @@ async function showPokemon(pokemon, allRenderedPokemonArr) {
   return evolutionTabHtml;
 }
 
-// ------------------------------------------------------------------------------
 // ------------------------------- Create overlay -------------------------------
-// ------------------------------------------------------------------------------
 
 async function createOverlayTemplate(pokemon, allRenderedPokemonArr) {
   const evolutionTabHtml = await showPokemon(pokemon, allRenderedPokemonArr);

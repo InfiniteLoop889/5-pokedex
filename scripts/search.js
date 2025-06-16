@@ -1,4 +1,4 @@
-async function getAllPokemon() {
+async function fetchAllPokemon() {
   try {
     let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0");
     let data = await response.json();
@@ -16,39 +16,28 @@ function addSearchBarListener(pokemonList, searchInput) {
     const searchString = event.target.value;
 
     if (searchString.length >= 3) {
-      await handleSearch(gridWrapper, buttonWrapper, pokemonList, searchString);
+      await handleSearch(pokemonList, buttonWrapper, gridWrapper, searchString);
     } else if (searchString.length === 0) {
-      await resetToOriginalList(gridWrapper, buttonWrapper);
+      await resetToOriginalList(buttonWrapper);
     }
   });
 }
 
-async function handleSearch(gridWrapper, buttonWrapper, pokemonList, searchString) {
+async function handleSearch(pokemonList, buttonWrapper, gridWrapper, searchString) {
   const filteredPokemonArray = pokemonList.filter((pokemon) => pokemon.name.includes(searchString.toLowerCase()));
   buttonWrapper.classList.add("hidden");
-  gridWrapper.innerHTML = "";
 
-  const pokemonData = await createPokemonArray(filteredPokemonArray);
-  displayData(pokemonData);
+  const pokemonData = await createPokemonArray(filteredPokemonArray, false);
+  displayData(pokemonData, true);
 }
 
-// reset offset and limit to display initial content after deleting the search bar input
-async function resetToOriginalList(gridWrapper, buttonWrapper) {
-  offset = 0;
-  limit = 32;
-
-  const BASE_URL = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
-  gridWrapper.innerHTML = "";
-
-  const originalPokemonList = await fetchPokemonData(BASE_URL);
-  const pokemonData = await createPokemonArray(originalPokemonList);
-  displayData(pokemonData);
-
+async function resetToOriginalList(buttonWrapper) {
+  displayData(allRenderedPokemonArr, true);
   buttonWrapper.classList.remove("hidden");
 }
 
 async function initSearch() {
-  const pokemonList = await getAllPokemon();
+  const pokemonList = await fetchAllPokemon();
   const searchInputDesktop = document.getElementById("search-navbar-desktop");
   const searchInputMobile = document.getElementById("search-navbar-mobile");
 
