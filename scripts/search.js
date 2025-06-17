@@ -10,28 +10,36 @@ async function fetchAllPokemon() {
 
 function addSearchBarListener(pokemonList, searchInput) {
   const buttonWrapper = document.getElementById("button-wrapper");
-  const gridWrapper = document.getElementById("grid-wrapper");
 
   searchInput.addEventListener("input", async function (event) {
     const searchString = event.target.value;
 
     if (searchString.length >= 3) {
-      await handleSearch(pokemonList, buttonWrapper, gridWrapper, searchString);
+      await handleSearch(pokemonList, buttonWrapper, searchString);
     } else if (searchString.length === 0) {
       await resetToOriginalList(buttonWrapper);
     }
   });
 }
 
-async function handleSearch(pokemonList, buttonWrapper, gridWrapper, searchString) {
+async function handleSearch(pokemonList, buttonWrapper, searchString) {
   const filteredPokemonArray = pokemonList.filter((pokemon) => pokemon.name.includes(searchString.toLowerCase()));
   buttonWrapper.classList.add("hidden");
 
-  const pokemonData = await createPokemonArray(filteredPokemonArray, false);
-  displayData(pokemonData, true);
+  const filteredPokemonData = await createPokemonArray(filteredPokemonArray, false);
+
+  currentSearchState.isFiltered = true;
+  currentSearchState.filteredList = filteredPokemonData;
+  currentSearchState.searchString = searchString;
+
+  displayData(filteredPokemonData, true);
 }
 
 async function resetToOriginalList(buttonWrapper) {
+  currentSearchState.isFiltered = false;
+  currentSearchState.filteredList = [];
+  currentSearchState.searchString = "";
+
   displayData(allRenderedPokemonArr, true);
   buttonWrapper.classList.remove("hidden");
 }
